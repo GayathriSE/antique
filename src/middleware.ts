@@ -1,41 +1,45 @@
-import { auth } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export default auth((req) => {
-  const { nextUrl, auth: session } = req;
-  const isLoggedIn = !!session?.user;
-  const role = (session?.user as { role?: string })?.role;
+export async function middleware(req: NextRequest) {
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
+  });
 
-  // Admin routes
+  const isLoggedIn = !!token?.sub;
+  const role = typeof token?.role === "string" ? token.role : undefined;
+  const { nextUrl } = req;
+
   if (nextUrl.pathname.startsWith("/admin")) {
     if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/login?callbackUrl=/admin/dashboard", nextUrl));
+      return NextResponse.redirect(
+        new URL("/login?callbackUrl=/admin/dashboard", nextUrl),
+      );
     }
     if (role !== "ADMIN") {
       return NextResponse.redirect(new URL("/", nextUrl));
     }
   }
 
-  // Protected user routes
-  if (nextUrl.pathname.startsWith("/dashboard") || nextUrl.pathname.startsWith("/checkout")) {
+  if (
+    nextUrl.pathname.startsWith("/dashboard") ||
+    nextUrl.pathname.startsWith("/checkout")
+  ) {
     if (!isLoggedIn) {
       return NextResponse.redirect(
-        new URL(`/login?callbackUrl=${nextUrl.pathname}`, nextUrl)
+        new URL(`/login?callbackUrl=${nextUrl.pathname}`, nextUrl),
       );
     }
   }
 
-  // Redirect authenticated users away from auth pages
-  if (
-    isLoggedIn &&
-    ["/login", "/register"].includes(nextUrl.pathname)
-  ) {
+  if (isLoggedIn && ["/login", "/register"].includes(nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/", nextUrl));
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)"],
