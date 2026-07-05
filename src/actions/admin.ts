@@ -16,10 +16,13 @@ async function requireAdmin() {
 
 // ─── Products ─────────────────────────────────────────────────────────────────
 
-export async function createProduct(data: unknown): Promise<ActionResponse<{ slug: string }>> {
+export async function createProduct(
+  data: unknown,
+): Promise<ActionResponse<{ slug: string }>> {
   await requireAdmin();
   const parsed = productSchema.safeParse(data);
-  if (!parsed.success) return { success: false, error: parsed.error.errors[0].message };
+  if (!parsed.success)
+    return { success: false, error: parsed.error.issues[0].message };
 
   const slug = slugify(parsed.data.name, { lower: true, strict: true });
 
@@ -37,10 +40,14 @@ export async function createProduct(data: unknown): Promise<ActionResponse<{ slu
   return { success: true, data: { slug: product.slug } };
 }
 
-export async function updateProduct(id: string, data: unknown): Promise<ActionResponse> {
+export async function updateProduct(
+  id: string,
+  data: unknown,
+): Promise<ActionResponse> {
   await requireAdmin();
   const parsed = productSchema.safeParse(data);
-  if (!parsed.success) return { success: false, error: parsed.error.errors[0].message };
+  if (!parsed.success)
+    return { success: false, error: parsed.error.issues[0].message };
 
   await db.product.update({
     where: { id },
@@ -69,7 +76,8 @@ export async function deleteProduct(id: string): Promise<ActionResponse> {
 export async function createCategory(data: unknown): Promise<ActionResponse> {
   await requireAdmin();
   const parsed = categorySchema.safeParse(data);
-  if (!parsed.success) return { success: false, error: parsed.error.errors[0].message };
+  if (!parsed.success)
+    return { success: false, error: parsed.error.issues[0].message };
 
   const slug = slugify(parsed.data.name, { lower: true, strict: true });
   await db.category.create({ data: { ...parsed.data, slug } });
@@ -79,10 +87,14 @@ export async function createCategory(data: unknown): Promise<ActionResponse> {
   return { success: true };
 }
 
-export async function updateCategory(id: string, data: unknown): Promise<ActionResponse> {
+export async function updateCategory(
+  id: string,
+  data: unknown,
+): Promise<ActionResponse> {
   await requireAdmin();
   const parsed = categorySchema.safeParse(data);
-  if (!parsed.success) return { success: false, error: parsed.error.errors[0].message };
+  if (!parsed.success)
+    return { success: false, error: parsed.error.issues[0].message };
 
   await db.category.update({ where: { id }, data: parsed.data });
 
@@ -93,7 +105,11 @@ export async function updateCategory(id: string, data: unknown): Promise<ActionR
 export async function deleteCategory(id: string): Promise<ActionResponse> {
   await requireAdmin();
   const count = await db.product.count({ where: { categoryId: id } });
-  if (count > 0) return { success: false, error: `Cannot delete: ${count} product(s) in this category.` };
+  if (count > 0)
+    return {
+      success: false,
+      error: `Cannot delete: ${count} product(s) in this category.`,
+    };
 
   await db.category.delete({ where: { id } });
   revalidatePath("/admin/categories");
@@ -102,7 +118,10 @@ export async function deleteCategory(id: string): Promise<ActionResponse> {
 
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
-export async function updateOrderStatus(id: string, status: string): Promise<ActionResponse> {
+export async function updateOrderStatus(
+  id: string,
+  status: string,
+): Promise<ActionResponse> {
   await requireAdmin();
   await db.order.update({ where: { id }, data: { status: status as never } });
   revalidatePath(`/admin/orders/${id}`);

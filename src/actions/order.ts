@@ -16,19 +16,29 @@ const razorpay = new Razorpay({
 
 export async function createRazorpayOrder(
   cartItems: { id: string; quantity: number }[],
-  address: AddressData
-): Promise<ActionResponse<{ razorpayOrderId: string; amount: number; currency: string; orderId: string }>> {
+  address: AddressData,
+): Promise<
+  ActionResponse<{
+    razorpayOrderId: string;
+    amount: number;
+    currency: string;
+    orderId: string;
+  }>
+> {
   const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Please sign in to checkout." };
+  if (!session?.user?.id)
+    return { success: false, error: "Please sign in to checkout." };
 
   const parsed = addressSchema.safeParse(address);
   if (!parsed.success) {
-    return { success: false, error: parsed.error.errors[0].message };
+    return { success: false, error: parsed.error.issues[0].message };
   }
 
   // Fetch actual product prices from DB (never trust client-side prices)
   const productIds = cartItems.map((i) => i.id);
-  const products = await db.product.findMany({ where: { id: { in: productIds } } });
+  const products = await db.product.findMany({
+    where: { id: { in: productIds } },
+  });
 
   if (products.length !== productIds.length) {
     return { success: false, error: "One or more products not found." };
@@ -37,7 +47,10 @@ export async function createRazorpayOrder(
   for (const item of cartItems) {
     const product = products.find((p) => p.id === item.id)!;
     if (product.stock < item.quantity) {
-      return { success: false, error: `"${product.name}" has insufficient stock.` };
+      return {
+        success: false,
+        error: `"${product.name}" has insufficient stock.`,
+      };
     }
   }
 
@@ -100,7 +113,7 @@ export async function verifyPayment(
   razorpayOrderId: string,
   razorpayPaymentId: string,
   razorpaySignature: string,
-  orderId: string
+  orderId: string,
 ): Promise<ActionResponse> {
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Unauthorized" };
@@ -137,7 +150,7 @@ export async function verifyPayment(
       db.product.update({
         where: { id: item.productId },
         data: { stock: { decrement: item.quantity } },
-      })
+      }),
     ),
   ]);
 
