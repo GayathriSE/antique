@@ -19,9 +19,33 @@ export type ProductWithCategory = Prisma.ProductGetPayload<{
   include: { category: true };
 }>;
 
+export type SafeProductWithCategory = Omit<
+  ProductWithCategory,
+  "price" | "discountPrice"
+> & {
+  price: number;
+  discountPrice: number | null;
+};
+
 export type ProductWithReviews = Prisma.ProductGetPayload<{
   include: { category: true; reviews: { include: { user: true } } };
 }>;
+
+export type SafeProductWithReviews = Omit<
+  ProductWithReviews,
+  "price" | "discountPrice"
+> & {
+  price: number;
+  discountPrice: number | null;
+};
+
+export type SafeProduct = Omit<
+  Prisma.ProductGetPayload<{}>,
+  "price" | "discountPrice"
+> & {
+  price: number;
+  discountPrice: number | null;
+};
 
 // ─── Cart ────────────────────────────────────────────────────────────────────
 
@@ -35,7 +59,12 @@ export type CartWithItems = Prisma.CartGetPayload<{
 
 // ─── Order ───────────────────────────────────────────────────────────────────
 
-export type OrderStatus = "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+export type OrderStatus =
+  | "PENDING"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
 
 export type OrderWithItems = Prisma.OrderGetPayload<{
   include: { items: { include: { product: true } } };
