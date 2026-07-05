@@ -2,13 +2,23 @@ import { db } from "@/lib/db";
 import type {
   ProductFilters,
   PaginatedResult,
+  ProductWithCategory,
+  ProductWithReviews,
   SafeProductWithCategory,
   SafeProductWithReviews,
 } from "@/types";
-import type { Prisma } from "@prisma/client";
+
+type ProductWhereInput = {
+  category?: { slug: string };
+  OR?: Array<Record<string, unknown>>;
+  price?: { gte?: number; lte?: number };
+  isFeatured?: boolean;
+};
+
+type ProductOrderByInput = { price?: "asc" | "desc"; createdAt?: "desc" };
 
 export function serializeProduct(
-  product: Prisma.ProductGetPayload<{ include: { category: true } }>,
+  product: ProductWithCategory,
 ): SafeProductWithCategory {
   return {
     ...product,
@@ -19,9 +29,7 @@ export function serializeProduct(
 }
 
 function serializeProductWithReviews(
-  product: Prisma.ProductGetPayload<{
-    include: { category: true; reviews: { include: { user: true } } };
-  }>,
+  product: ProductWithReviews,
 ): SafeProductWithReviews {
   return {
     ...product,
@@ -45,7 +53,7 @@ export async function getProducts(
     limit = 12,
   } = filters;
 
-  const where: Prisma.ProductWhereInput = {};
+  const where: ProductWhereInput = {};
 
   if (category) {
     where.category = { slug: category };
@@ -67,7 +75,7 @@ export async function getProducts(
     where.isFeatured = featured;
   }
 
-  const orderBy: Prisma.ProductOrderByWithRelationInput =
+  const orderBy: ProductOrderByInput =
     sort === "price_asc"
       ? { price: "asc" }
       : sort === "price_desc"

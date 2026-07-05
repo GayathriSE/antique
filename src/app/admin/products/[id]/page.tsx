@@ -15,7 +15,10 @@ export default async function EditProductPage({
     notFound();
   }
 
-  const product = await db.product.findUnique({ where: { id } });
+  const product = await db.product.findUnique({
+    where: { id },
+    include: { category: true },
+  });
   if (!product) notFound();
 
   const categories = await db.category.findMany({ orderBy: { name: "asc" } });

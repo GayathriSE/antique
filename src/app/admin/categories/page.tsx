@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { categorySchema, type CategoryInput } from "@/validations/product";
 import { createCategory, deleteCategory } from "@/actions/admin";
 import { toast } from "sonner";
-import type { Category } from "@prisma/client";
+import type { Category } from "@/types";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);

@@ -23,7 +23,7 @@ export default async function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {orders.map((order) => (
+              {orders.map((order:any) => (
                 <tr key={order.id} className="hover:bg-stone-50">
                   <td className="px-5 py-4 font-mono text-xs text-stone-600">#{order.id.slice(-8).toUpperCase()}</td>
                   <td className="px-5 py-4">

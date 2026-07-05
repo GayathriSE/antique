@@ -39,7 +39,7 @@ export default async function FeaturedCollections() {
 
         {/* Category grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {categories.map((cat) => (
+          {categories.map((cat:any) => (
             <Link
               key={cat.id}
               href={`/products?category=${cat.slug}`}

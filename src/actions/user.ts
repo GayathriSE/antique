@@ -3,7 +3,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { profileSchema, addressSchema } from "@/validations/checkout";
-import type { ActionResponse } from "@/types";
+import type { ActionResponse, AddressData } from "@/types";
 
 export async function updateProfile(data: unknown): Promise<ActionResponse> {
   const session = await auth();
@@ -21,13 +21,19 @@ export async function updateProfile(data: unknown): Promise<ActionResponse> {
   return { success: true };
 }
 
-export async function getUserAddresses() {
+export async function getUserAddresses(): Promise<AddressData[]> {
   const session = await auth();
   if (!session?.user?.id) return [];
-  return db.address.findMany({
+
+  const addresses = await db.address.findMany({
     where: { userId: session.user.id },
     orderBy: { isDefault: "desc" },
   });
+
+  return addresses.map((address) => ({
+    ...address,
+    line2: address.line2 ?? undefined,
+  }));
 }
 
 export async function createAddress(data: unknown): Promise<ActionResponse> {

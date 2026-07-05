@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
-import type { Category } from "@prisma/client";
+import type { Category } from "@/types";
 
 interface ProductFiltersProps {
   categories: Category[];
@@ -24,7 +24,7 @@ export default function ProductFilters({ categories }: ProductFiltersProps) {
       params.delete("page");
       router.push(`${pathname}?${params.toString()}`);
     },
-    [router, pathname, searchParams]
+    [router, pathname, searchParams],
   );
 
   const activeCategory = searchParams.get("category");
@@ -35,17 +35,22 @@ export default function ProductFilters({ categories }: ProductFiltersProps) {
     router.push(pathname);
   }
 
-  const hasFilters = activeCategory || activeMin || activeMax || searchParams.get("search");
+  const hasFilters =
+    activeCategory || activeMin || activeMax || searchParams.get("search");
 
   return (
     <div className="space-y-6">
       {/* Search */}
       <div>
-        <h3 className="text-sm font-semibold text-stone-800 uppercase tracking-wider mb-3">Search</h3>
+        <h3 className="text-sm font-semibold text-stone-800 uppercase tracking-wider mb-3">
+          Search
+        </h3>
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            const q = (e.currentTarget.elements.namedItem("search") as HTMLInputElement).value;
+            const q = (
+              e.currentTarget.elements.namedItem("search") as HTMLInputElement
+            ).value;
             setParam("search", q);
           }}
         >
@@ -56,9 +61,22 @@ export default function ProductFilters({ categories }: ProductFiltersProps) {
               placeholder="Search jewellery..."
               className="flex-1 px-3 py-2 text-sm border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
-            <button type="submit" className="px-3 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <button
+              type="submit"
+              className="px-3 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </button>
           </div>
@@ -67,7 +85,9 @@ export default function ProductFilters({ categories }: ProductFiltersProps) {
 
       {/* Categories */}
       <div>
-        <h3 className="text-sm font-semibold text-stone-800 uppercase tracking-wider mb-3">Category</h3>
+        <h3 className="text-sm font-semibold text-stone-800 uppercase tracking-wider mb-3">
+          Category
+        </h3>
         <ul className="space-y-1">
           <li>
             <button
@@ -100,13 +120,19 @@ export default function ProductFilters({ categories }: ProductFiltersProps) {
 
       {/* Price range */}
       <div>
-        <h3 className="text-sm font-semibold text-stone-800 uppercase tracking-wider mb-3">Price (₹)</h3>
+        <h3 className="text-sm font-semibold text-stone-800 uppercase tracking-wider mb-3">
+          Price (₹)
+        </h3>
         <form
           className="space-y-2"
           onSubmit={(e) => {
             e.preventDefault();
-            const min = (e.currentTarget.elements.namedItem("min") as HTMLInputElement).value;
-            const max = (e.currentTarget.elements.namedItem("max") as HTMLInputElement).value;
+            const min = (
+              e.currentTarget.elements.namedItem("min") as HTMLInputElement
+            ).value;
+            const max = (
+              e.currentTarget.elements.namedItem("max") as HTMLInputElement
+            ).value;
             setParam("minPrice", min);
             setParam("maxPrice", max);
           }}

@@ -1,26 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import type { Category, Product } from "@prisma/client";
+import type { Category, SafeProductWithCategory } from "@/types";
 import { productSchema, type ProductInput } from "@/validations/product";
 import { createProduct, updateProduct } from "@/actions/admin";
 import { toast } from "sonner";
 import ImageUpload from "@/components/admin/ImageUpload";
 
-interface SafeProductFormProps extends Omit<
-  Product,
-  "price" | "discountPrice"
-> {
-  price: number;
-  discountPrice: number | null;
-}
-
 interface Props {
   categories: Category[];
-  product?: SafeProductFormProps | null;
+  product?: SafeProductWithCategory | null;
 }
 
 export default function ProductForm({ categories, product }: Props) {
@@ -28,13 +20,15 @@ export default function ProductForm({ categories, product }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<string[]>(product?.images || []);
 
+  const resolver: any = zodResolver(productSchema);
+
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm<ProductInput>({
-    resolver: zodResolver(productSchema),
+    resolver,
     defaultValues: product
       ? {
           name: product.name,

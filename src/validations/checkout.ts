@@ -9,9 +9,7 @@ export const addressSchema = z.object({
   line2: z.string().optional(),
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
-  postalCode: z
-    .string()
-    .regex(/^\d{6}$/, "Enter a valid 6-digit PIN code"),
+  postalCode: z.string().regex(/^\d{6}$/, "Enter a valid 6-digit PIN code"),
   country: z.string().default("India"),
 });
 
@@ -20,5 +18,5 @@ export const profileSchema = z.object({
   image: z.string().url().optional().or(z.literal("")),
 });
 
-export type AddressInput = z.infer<typeof addressSchema>;
+export type AddressInput = z.input<typeof addressSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;

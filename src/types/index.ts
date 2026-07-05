@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+type DecimalLike = number | string | { toNumber(): number };
 
 // ─── User ────────────────────────────────────────────────────────────────────
 
@@ -15,9 +15,43 @@ export type SafeUser = {
 
 // ─── Product ─────────────────────────────────────────────────────────────────
 
-export type ProductWithCategory = Prisma.ProductGetPayload<{
-  include: { category: true };
-}>;
+export type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type ProductBase = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: DecimalLike;
+  discountPrice: DecimalLike | null;
+  images: string[];
+  categoryId: string;
+  stock: number;
+  weight: string | null;
+  material: string | null;
+  isFeatured: boolean;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Product = Omit<ProductBase, "price" | "discountPrice"> & {
+  price: number;
+  discountPrice: number | null;
+};
+
+export type ProductWithCategory = ProductBase & {
+  category: Category;
+};
 
 export type SafeProductWithCategory = Omit<
   ProductWithCategory,
@@ -27,9 +61,10 @@ export type SafeProductWithCategory = Omit<
   discountPrice: number | null;
 };
 
-export type ProductWithReviews = Prisma.ProductGetPayload<{
-  include: { category: true; reviews: { include: { user: true } } };
-}>;
+export type ProductWithReviews = ProductBase & {
+  category: Category;
+  reviews: Array<{ user?: unknown }>;
+};
 
 export type SafeProductWithReviews = Omit<
   ProductWithReviews,
@@ -39,23 +74,30 @@ export type SafeProductWithReviews = Omit<
   discountPrice: number | null;
 };
 
-export type SafeProduct = Omit<
-  Prisma.ProductGetPayload<{}>,
-  "price" | "discountPrice"
-> & {
+export type SafeProduct = Omit<ProductBase, "price" | "discountPrice"> & {
   price: number;
   discountPrice: number | null;
 };
 
 // ─── Cart ────────────────────────────────────────────────────────────────────
 
-export type CartItemWithProduct = Prisma.CartItemGetPayload<{
-  include: { product: true };
-}>;
+export type CartItemWithProduct = {
+  id: string;
+  productId: string;
+  cartId: string;
+  quantity: number;
+  createdAt: Date;
+  updatedAt: Date;
+  product: Product;
+};
 
-export type CartWithItems = Prisma.CartGetPayload<{
-  include: { items: { include: { product: true } } };
-}>;
+export type CartWithItems = {
+  id: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  items: CartItemWithProduct[];
+};
 
 // ─── Order ───────────────────────────────────────────────────────────────────
 
@@ -66,25 +108,43 @@ export type OrderStatus =
   | "DELIVERED"
   | "CANCELLED";
 
-export type OrderWithItems = Prisma.OrderGetPayload<{
-  include: { items: { include: { product: true } } };
-}>;
+export type OrderWithItems = {
+  id: string;
+  userId: string;
+  status: string;
+  total: number;
+  createdAt: Date;
+  updatedAt: Date;
+  items: Array<{ product: Product }>;
+};
 
-export type OrderWithUser = Prisma.OrderGetPayload<{
-  include: { user: true; items: true };
-}>;
+export type OrderWithUser = {
+  id: string;
+  userId: string;
+  status: string;
+  total: number;
+  createdAt: Date;
+  updatedAt: Date;
+  user: SafeUser;
+  items: Array<{ product: Product }>;
+};
 
 // ─── Address ─────────────────────────────────────────────────────────────────
 
 export type AddressData = {
+  id?: string;
+  userId?: string;
   name: string;
   phone: string;
   line1: string;
-  line2?: string;
+  line2?: string | null;
   city: string;
   state: string;
   postalCode: string;
   country: string;
+  isDefault?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 // ─── Pagination ──────────────────────────────────────────────────────────────

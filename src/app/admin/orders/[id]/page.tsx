@@ -20,7 +20,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
           <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
             <h2 className="font-semibold text-stone-800 px-5 py-4 border-b border-stone-100">Order Items</h2>
             <div className="divide-y divide-stone-100">
-              {order.items.map((item) => (
+              {order.items.map((item:any) => (
                 <div key={item.id} className="flex items-center gap-4 px-5 py-4">
                   {item.image && (
                     // eslint-disable-next-line @next/next/no-img-element

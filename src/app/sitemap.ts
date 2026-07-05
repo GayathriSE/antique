@@ -16,14 +16,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/register`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
   ];
 
-  const productRoutes: MetadataRoute.Sitemap = products.map((p) => ({
+  const productRoutes: MetadataRoute.Sitemap = products.map((p:any) => ({
     url: `${baseUrl}/products/${p.slug}`,
     lastModified: p.updatedAt,
     changeFrequency: "weekly",
     priority: 0.8,
   }));
 
-  const categoryRoutes: MetadataRoute.Sitemap = categories.map((c) => ({
+  const categoryRoutes: MetadataRoute.Sitemap = categories.map((c:any) => ({
     url: `${baseUrl}/products?category=${c.slug}`,
     lastModified: c.updatedAt,
     changeFrequency: "weekly",

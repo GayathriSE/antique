@@ -35,7 +35,7 @@ export async function createRazorpayOrder(
   }
 
   // Fetch actual product prices from DB (never trust client-side prices)
-  const productIds = cartItems.map((i) => i.id);
+  const productIds = cartItems.map((i: any) => i.id);
   const products = await db.product.findMany({
     where: { id: { in: productIds } },
   });
@@ -45,7 +45,7 @@ export async function createRazorpayOrder(
   }
 
   for (const item of cartItems) {
-    const product = products.find((p) => p.id === item.id)!;
+    const product = products.find((p: any) => p.id === item.id)!;
     if (product.stock < item.quantity) {
       return {
         success: false,
@@ -55,7 +55,7 @@ export async function createRazorpayOrder(
   }
 
   const subtotal = cartItems.reduce((sum, item) => {
-    const product = products.find((p) => p.id === item.id)!;
+    const product = products.find((p: any) => p.id === item.id)!;
     const price = Number(product.discountPrice ?? product.price);
     return sum + price * item.quantity;
   }, 0);
@@ -85,7 +85,7 @@ export async function createRazorpayOrder(
       shippingAddress: parsed.data,
       items: {
         create: cartItems.map((item) => {
-          const product = products.find((p) => p.id === item.id)!;
+          const product = products.find((p: any) => p.id === item.id)!;
           return {
             productId: product.id,
             quantity: item.quantity,
@@ -146,7 +146,7 @@ export async function verifyPayment(
         paymentId: razorpayPaymentId,
       },
     }),
-    ...order.items.map((item) =>
+    ...order.items.map((item: any) =>
       db.product.update({
         where: { id: item.productId },
         data: { stock: { decrement: item.quantity } },
@@ -160,7 +160,7 @@ export async function verifyPayment(
     customerName: order.user.name || "Unknown",
     customerEmail: order.user.email,
     total: Number(order.total),
-    itemCount: order.items.reduce((s, i) => s + i.quantity, 0),
+    itemCount: order.items.reduce((s: any, i: any) => s + i.quantity, 0),
     paymentId: razorpayPaymentId,
   }).catch((err) => console.error("[WhatsApp] Notification error:", err));
 

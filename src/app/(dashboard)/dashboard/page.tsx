@@ -18,8 +18,8 @@ export default async function DashboardPage() {
   ]);
 
   const totalSpent = orders
-    .filter((o) => o.paymentStatus === "paid")
-    .reduce((s, o) => s + Number(o.total), 0);
+    .filter((o:any) => o.paymentStatus === "paid")
+    .reduce((s:any, o:any) => s + Number(o.total), 0);
 
   return (
     <div>
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="divide-y divide-stone-100">
-            {orders.map((order) => {
+            {orders.map((order:any) => {
               const status = ORDER_STATUSES.find((s) => s.value === order.status);
               return (
                 <div key={order.id} className="px-5 py-4 flex items-center justify-between">

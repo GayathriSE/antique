@@ -40,7 +40,7 @@ export default function ProductDetail({ product }: Props) {
 
   const avgRating =
     product.reviews.length > 0
-      ? product.reviews.reduce((s, r) => s + r.rating, 0) /
+      ? product.reviews.reduce((s: any, r: any) => s + r.rating, 0) /
         product.reviews.length
       : 0;
 
@@ -79,7 +79,7 @@ export default function ProductDetail({ product }: Props) {
           </div>
           {product.images.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {product.images.map((img, i) => (
+              {product.images.map((img: any, i: any) => (
                 <button
                   key={i}
                   onClick={() => setSelectedImage(i)}
@@ -252,7 +252,7 @@ export default function ProductDetail({ product }: Props) {
             Reviews ({product.reviews.length})
           </h2>
           <div className="space-y-6">
-            {product.reviews.map((r) => (
+            {product.reviews.map((r:any) => (
               <div
                 key={r.id}
                 className="border border-stone-100 rounded-xl p-5"
