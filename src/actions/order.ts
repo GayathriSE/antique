@@ -9,10 +9,19 @@ import type { AddressData } from "@/types";
 import crypto from "crypto";
 import { sendAdminWhatsAppNotification } from "@/lib/whatsapp";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+function getRazorpayClient() {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!keyId || !keySecret) {
+    return null;
+  }
+
+  return new Razorpay({
+    key_id: keyId,
+    key_secret: keySecret,
+  });
+}
 
 export async function createRazorpayOrder(
   cartItems: { id: string; quantity: number }[],
@@ -63,6 +72,11 @@ export async function createRazorpayOrder(
   const shipping = subtotal >= 5000 ? 0 : 299;
   const tax = Math.round(subtotal * 0.18);
   const total = subtotal + shipping + tax;
+
+  const razorpay = getRazorpayClient();
+  if (!razorpay) {
+    return { success: false, error: "Razorpay is not configured." };
+  }
 
   // Create Razorpay order
   const rpOrder = await razorpay.orders.create({
